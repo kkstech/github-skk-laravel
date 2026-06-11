@@ -21,4 +21,9 @@ class Certificate extends Model
         'tanggal_ditetapkan',
         'tanggal_berlaku',
     ];
+
+    protected $casts = [
+        'tanggal_ditetapkan' => 'date',
+        'tanggal_berlaku' => 'date',
+    ];
 }

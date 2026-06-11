@@ -21,8 +21,8 @@ return new class extends Migration
             $table->string('nomor_registrasi')->unique();
             $table->string('nama_lsp');
             $table->string('nama_asosiasi');
-            $table->string('tanggal_ditetapkan');
-            $table->string('tanggal_berlaku');
+            $table->date('tanggal_ditetapkan');
+            $table->date('tanggal_berlaku');
             $table->timestamps();
         });
     }

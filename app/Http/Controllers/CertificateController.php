@@ -49,8 +49,8 @@ class CertificateController extends Controller
             'nomor_registrasi'   => 'required|string|max:255|unique:certificates,nomor_registrasi',
             'nama_lsp'           => 'required|string|max:255',
             'nama_asosiasi'      => 'required|string|max:255',
-            'tanggal_ditetapkan' => 'required|string|max:100',
-            'tanggal_berlaku'    => 'required|string|max:100',
+            'tanggal_ditetapkan' => 'required|date',
+            'tanggal_berlaku'    => 'required|date',
         ]);
 
         $cert = Certificate::create($validated);
@@ -90,8 +90,8 @@ class CertificateController extends Controller
             ],
             'nama_lsp'           => 'required|string|max:255',
             'nama_asosiasi'      => 'required|string|max:255',
-            'tanggal_ditetapkan' => 'required|string|max:100',
-            'tanggal_berlaku'    => 'required|string|max:100',
+            'tanggal_ditetapkan' => 'required|date',
+            'tanggal_berlaku'    => 'required|date',
         ]);
 
         $certificate->update($validated);

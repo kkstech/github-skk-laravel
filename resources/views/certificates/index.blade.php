@@ -85,12 +85,12 @@
 
                 <div class="input-group">
                     <label for="tanggal_ditetapkan">Tanggal Ditetapkan</label>
-                    <input type="text" id="tanggal_ditetapkan" placeholder="YYYY-MM-DD HH:MM:SS" required autocomplete="off">
+                    <input type="date" id="tanggal_ditetapkan" required autocomplete="off">
                 </div>
 
                 <div class="input-group">
                     <label for="tanggal_berlaku">Berlaku Sampai</label>
-                    <input type="text" id="tanggal_berlaku" placeholder="YYYY-MM-DD HH:MM:SS" required autocomplete="off">
+                    <input type="date" id="tanggal_berlaku" required autocomplete="off">
                 </div>
             </div>
 
@@ -399,7 +399,11 @@ certsGrid.addEventListener('click', async (e) => {
         if (!cert) return;
         certIdInput.value = cert.id;
         FIELDS.forEach(f => {
-            document.getElementById(f).value = cert[f] || '';
+            let val = cert[f] || '';
+            if ((f === 'tanggal_ditetapkan' || f === 'tanggal_berlaku') && val) {
+                val = val.substring(0, 10);
+            }
+            document.getElementById(f).value = val;
         });
         isEditing = true;
         formTitle.textContent = 'Edit Sertifikat';

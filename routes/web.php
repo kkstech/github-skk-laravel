@@ -13,7 +13,7 @@ Route::get('/', [CertificateController::class, 'index'])->name('certificates.ind
 
 Route::prefix('certificates')->name('certificates.')->group(function () {
     Route::post('/', [CertificateController::class, 'store'])->name('store');
-    Route::get('/{certificate}', [CertificateController::class, 'show'])->name('show');
+    Route::get('/{certificate:nomor_registrasi}', [CertificateController::class, 'show'])->name('show');
     Route::put('/{certificate}', [CertificateController::class, 'update'])->name('update');
     Route::delete('/{certificate}', [CertificateController::class, 'destroy'])->name('destroy');
 });

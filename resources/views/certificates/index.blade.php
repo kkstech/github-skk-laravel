@@ -151,10 +151,13 @@
         <div class="modal-body">
             <div id="qrcode-container"></div>
             <p class="qr-instruction">Scan menggunakan kamera HP untuk melihat desain sertifikat.</p>
-            <div style="margin-top: 1rem;">
-                <a href="#" id="open-link-btn" target="_blank" class="btn btn-primary" style="text-decoration: none; display: inline-flex; width: auto; padding: 0.75rem 1.5rem;">
+            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                <a href="#" id="open-link-btn" target="_blank" class="btn btn-primary" style="text-decoration: none; display: inline-flex; width: auto; padding: 0.75rem 1.5rem; justify-content: center; align-items: center;">
                     <i data-lucide="external-link"></i> Buka di Tab Baru
                 </a>
+                <button id="download-qr-btn" class="btn btn-secondary" style="display: inline-flex; width: auto; padding: 0.75rem 1.5rem; justify-content: center; align-items: center;">
+                    <i data-lucide="download"></i> Download QR
+                </button>
             </div>
         </div>
     </div>
@@ -169,7 +172,7 @@
 const ROUTES = {
     index:   '{{ route('certificates.index') }}',
     store:   '{{ route('certificates.store') }}',
-    show:    (id) => `{{ url('/certificates') }}/${id}`,
+    show:    (nomor_registrasi) => `{{ url('/certificates') }}/${encodeURIComponent(nomor_registrasi)}`,
     update:  (id) => `{{ url('/certificates') }}/${id}`,
     destroy: (id) => `{{ url('/certificates') }}/${id}`,
 };
@@ -193,6 +196,7 @@ const qrModal     = document.getElementById('qr-modal');
 const closeModal  = document.getElementById('close-modal');
 const qrContainer = document.getElementById('qrcode-container');
 const openLinkBtn = document.getElementById('open-link-btn');
+const downloadQrBtn = document.getElementById('download-qr-btn');
 const toast       = document.getElementById('toast');
 const toastMsg    = document.getElementById('toast-message');
 const toastIcon   = document.getElementById('toast-icon');
@@ -206,6 +210,7 @@ const FIELDS = [
 let isEditing    = false;
 let qrInstance   = null;
 let certificates = [];
+let activeCertNameForQr = '';
 
 // ──────────────────────────────────────────────────────────────
 // Region API (EMSifa API Wilayah Indonesia)
@@ -472,8 +477,8 @@ certForm.addEventListener('submit', async (e) => {
     } catch (err) {
         const msg = err?.message || (err?.errors ? Object.values(err.errors)[0][0] : 'Terjadi kesalahan');
         showToast(msg, 'error');
-    } finally {
         submitBtn.innerHTML = btnOrig;
+    } finally {
         submitBtn.disabled = false;
         lucide.createIcons();
     }
@@ -535,7 +540,8 @@ certsGrid.addEventListener('click', async (e) => {
 
     if (btn.classList.contains('btn-qr')) {
         if (!cert) return;
-        const certUrl = ROUTES.show(cert.id);
+        const certUrl = ROUTES.show(cert.nomor_registrasi);
+        activeCertNameForQr = cert.nama;
 
         qrContainer.innerHTML = '';
         if (qrInstance) { qrInstance = null; }
@@ -550,6 +556,37 @@ certsGrid.addEventListener('click', async (e) => {
         openLinkBtn.href = certUrl;
         qrModal.classList.remove('hidden');
     }
+});
+
+// ──────────────────────────────────────────────────────────────
+// Download QR Code
+// ──────────────────────────────────────────────────────────────
+function downloadQRCode(name) {
+    const canvas = qrContainer.querySelector('canvas');
+    let dataUrl = '';
+    if (canvas) {
+        dataUrl = canvas.toDataURL('image/png');
+    } else {
+        const img = qrContainer.querySelector('img');
+        if (img) {
+            dataUrl = img.src;
+        }
+    }
+    
+    if (dataUrl) {
+        const link = document.createElement('a');
+        link.href = dataUrl;
+        link.download = `QR_Code_${name.replace(/[^a-zA-Z0-9]/g, '_')}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } else {
+        showToast('Gagal mengunduh QR Code', 'error');
+    }
+}
+
+downloadQrBtn.addEventListener('click', () => {
+    downloadQRCode(activeCertNameForQr);
 });
 
 // ──────────────────────────────────────────────────────────────

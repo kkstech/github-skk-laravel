@@ -6,8 +6,7 @@
     <title>Sertifikat - {{ $certificate->nama }}</title>
     <meta name="description" content="Sertifikat Kompetensi Kerja {{ $certificate->nama }}">
     
-    <!-- html2pdf for PDF export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
@@ -21,42 +20,7 @@
             min-height: 100vh;
         }
 
-        .actions {
-            margin-bottom: 20px;
-            text-align: center;
-        }
 
-        .btn-back {
-            background-color: #64748b;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-right: 8px;
-            text-decoration: none;
-            display: inline-block;
-            transition: background 0.3s;
-        }
-
-        .btn-back:hover { background-color: #475569; }
-
-        .btn-export {
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
-            transition: background 0.3s, transform 0.2s;
-        }
-
-        .btn-export:hover { background-color: #2563eb; transform: translateY(-2px); }
 
         .cert-container {
             background-color: white;
@@ -104,10 +68,7 @@
 </head>
 <body>
 
-    <div class="actions" id="action-bar">
-        <a href="{{ url('/') }}" class="btn-back">← Kembali</a>
-        <button class="btn-export" onclick="exportPDF()">📥 Download / Export PDF</button>
-    </div>
+
 
     <div class="cert-container" id="cert-view">
         <div class="cert-header">
@@ -171,21 +132,6 @@
         </div>
     </div>
 
-    <script>
-        function exportPDF() {
-            const element = document.getElementById('cert-view');
-            const safeName = '{{ addslashes(preg_replace("/[^a-zA-Z0-9_]/", "_", $certificate->nama)) }}';
 
-            const opt = {
-                margin:      0.5,
-                filename:    `Sertifikat_${safeName}.pdf`,
-                image:       { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF:       { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
-
-            html2pdf().set(opt).from(element).save();
-        }
-    </script>
 </body>
 </html>

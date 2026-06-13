@@ -35,12 +35,16 @@
 
                 <div class="input-group">
                     <label for="provinsi">Provinsi</label>
-                    <input type="text" id="provinsi" placeholder="Contoh: Sulawesi Tenggara" required autocomplete="off">
+                    <select id="provinsi" required>
+                        <option value="">Pilih Provinsi</option>
+                    </select>
                 </div>
 
                 <div class="input-group">
                     <label for="kabupaten">Kabupaten / Kota</label>
-                    <input type="text" id="kabupaten" placeholder="Contoh: Kota Bau Bau" required autocomplete="off">
+                    <select id="kabupaten" required disabled>
+                        <option value="">Pilih Kabupaten / Kota</option>
+                    </select>
                 </div>
 
                 <div class="input-group">
@@ -204,6 +208,96 @@ let qrInstance   = null;
 let certificates = [];
 
 // ──────────────────────────────────────────────────────────────
+// Region API (EMSifa API Wilayah Indonesia)
+// ──────────────────────────────────────────────────────────────
+const REGION_API = {
+    provinces: 'https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json',
+    regencies: (provId) => `https://www.emsifa.com/api-wilayah-indonesia/api/regencies/${provId}.json`
+};
+
+const provSelect = document.getElementById('provinsi');
+const kabSelect = document.getElementById('kabupaten');
+
+let provincesData = [];
+
+// Format ALL CAPS to Title Case
+function formatTitleCase(str) {
+    return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+}
+
+// Fetch and load provinces
+async function loadProvinces() {
+    try {
+        const res = await fetch(REGION_API.provinces);
+        provincesData = await res.json();
+        
+        provSelect.innerHTML = '<option value="">Pilih Provinsi</option>';
+        provincesData.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.name;
+            opt.dataset.id = p.id;
+            opt.textContent = formatTitleCase(p.name);
+            provSelect.appendChild(opt);
+        });
+    } catch (e) {
+        showToast('Gagal memuat daftar provinsi', 'error');
+    }
+}
+
+// Fetch and load regencies based on selected province
+async function loadRegencies(provinceName, selectVal = '') {
+    const selectedOpt = Array.from(provSelect.options).find(opt => opt.value === provinceName);
+    if (!selectedOpt || !selectedOpt.dataset.id) {
+        kabSelect.innerHTML = '<option value="">Pilih Kabupaten / Kota</option>';
+        kabSelect.disabled = true;
+        return;
+    }
+
+    const provId = selectedOpt.dataset.id;
+    kabSelect.disabled = true;
+    kabSelect.innerHTML = '<option value="">Memuat...</option>';
+
+    try {
+        const res = await fetch(REGION_API.regencies(provId));
+        const regencies = await res.json();
+
+        kabSelect.innerHTML = '<option value="">Pilih Kabupaten / Kota</option>';
+        regencies.forEach(r => {
+            const opt = document.createElement('option');
+            opt.value = r.name;
+            opt.dataset.id = r.id;
+            opt.textContent = formatTitleCase(r.name);
+            kabSelect.appendChild(opt);
+        });
+
+        kabSelect.disabled = false;
+
+        if (selectVal) {
+            selectOptionCaseInsensitive(kabSelect, selectVal);
+        }
+    } catch (e) {
+        showToast('Gagal memuat daftar kabupaten/kota', 'error');
+        kabSelect.innerHTML = '<option value="">Gagal memuat data</option>';
+    }
+}
+
+// Case-insensitive selection utility
+function selectOptionCaseInsensitive(selectEl, value) {
+    const valUpper = value.toUpperCase();
+    const opt = Array.from(selectEl.options).find(o => o.value.toUpperCase() === valUpper);
+    if (opt) {
+        selectEl.value = opt.value;
+        return opt;
+    }
+    return null;
+}
+
+// Listen to province changes
+provSelect.addEventListener('change', (e) => {
+    loadRegencies(e.target.value);
+});
+
+// ──────────────────────────────────────────────────────────────
 // Toast
 // ──────────────────────────────────────────────────────────────
 function showToast(message, type = 'success') {
@@ -337,6 +431,8 @@ function resetForm() {
     formIcon.setAttribute('data-lucide', 'file-plus');
     submitBtn.innerHTML = '<i data-lucide="save"></i> Simpan Sertifikat';
     cancelBtn.classList.add('hidden');
+    kabSelect.innerHTML = '<option value="">Pilih Kabupaten / Kota</option>';
+    kabSelect.disabled = true;
     lucide.createIcons();
 }
 
@@ -399,12 +495,23 @@ certsGrid.addEventListener('click', async (e) => {
         if (!cert) return;
         certIdInput.value = cert.id;
         FIELDS.forEach(f => {
+            if (f === 'provinsi' || f === 'kabupaten') return;
             let val = cert[f] || '';
             if ((f === 'tanggal_ditetapkan' || f === 'tanggal_berlaku') && val) {
                 val = val.substring(0, 10);
             }
             document.getElementById(f).value = val;
         });
+
+        // Set province and asynchronously load & set regencies
+        const provOpt = selectOptionCaseInsensitive(provSelect, cert.provinsi || '');
+        if (provOpt) {
+            await loadRegencies(provOpt.value, cert.kabupaten);
+        } else {
+            kabSelect.innerHTML = '<option value="">Pilih Kabupaten / Kota</option>';
+            kabSelect.disabled = true;
+        }
+
         isEditing = true;
         formTitle.textContent = 'Edit Sertifikat';
         formIcon.setAttribute('data-lucide', 'edit');
@@ -464,6 +571,7 @@ qrModal.addEventListener('click', (e) => { if (e.target === qrModal) qrModal.cla
 // Init
 // ──────────────────────────────────────────────────────────────
 lucide.createIcons();
+loadProvinces();
 loadCerts();
 </script>
 @endpush

@@ -49,27 +49,35 @@
 
                 <div class="input-group">
                     <label for="klasifikasi">Klasifikasi</label>
-                    <input type="text" id="klasifikasi" placeholder="Contoh: SIPIL" required autocomplete="off">
+                    <select id="klasifikasi" required>
+                        <option value="">Pilih Klasifikasi</option>
+                    </select>
                 </div>
 
                 <div class="input-group full-width">
                     <label for="subklasifikasi">Subklasifikasi</label>
-                    <input type="text" id="subklasifikasi" placeholder="Contoh: Ahli Muda Teknik Pantai" required autocomplete="off">
+                    <select id="subklasifikasi" required disabled>
+                        <option value="">Pilih Subklasifikasi</option>
+                    </select>
                 </div>
 
                 <div class="input-group">
                     <label for="kualifikasi">Kualifikasi</label>
-                    <input type="text" id="kualifikasi" placeholder="Contoh: Ahli" required autocomplete="off">
+                    <select id="kualifikasi" required>
+                        <option value="">Pilih Kualifikasi</option>
+                    </select>
                 </div>
 
                 <div class="input-group">
                     <label for="kode_jabatan">Kode Jabatan Kerja</label>
-                    <input type="text" id="kode_jabatan" placeholder="Contoh: SI091013" required autocomplete="off">
+                    <input type="text" id="kode_jabatan" placeholder="Terisi otomatis" required readonly>
                 </div>
 
                 <div class="input-group full-width">
                     <label for="jabatan_kerja">Jabatan Kerja</label>
-                    <input type="text" id="jabatan_kerja" placeholder="Contoh: Ahli Muda Teknik Pantai" required autocomplete="off">
+                    <select id="jabatan_kerja" required disabled>
+                        <option value="">Pilih Jabatan Kerja</option>
+                    </select>
                 </div>
 
                 <div class="input-group full-width">
@@ -79,12 +87,16 @@
 
                 <div class="input-group full-width">
                     <label for="nama_lsp">Nama LSP</label>
-                    <input type="text" id="nama_lsp" placeholder="Contoh: LSP ASTEKINDO KONSTRUKSI MANDIRI" required autocomplete="off">
+                    <select id="nama_lsp" required>
+                        <option value="">Pilih LSP</option>
+                    </select>
                 </div>
 
                 <div class="input-group full-width">
                     <label for="nama_asosiasi">Nama Asosiasi</label>
-                    <input type="text" id="nama_asosiasi" placeholder="Contoh: PERPAKOM" required autocomplete="off">
+                    <select id="nama_asosiasi" required>
+                        <option value="">Pilih Asosiasi</option>
+                    </select>
                 </div>
 
                 <div class="input-group">
@@ -303,6 +315,121 @@ provSelect.addEventListener('change', (e) => {
 });
 
 // ──────────────────────────────────────────────────────────────
+// Master Data API & Cascade
+// ──────────────────────────────────────────────────────────────
+const klasifikasiSelect = document.getElementById('klasifikasi');
+const subklasifikasiSelect = document.getElementById('subklasifikasi');
+const kualifikasiSelect = document.getElementById('kualifikasi');
+const kodeJabatanInput = document.getElementById('kode_jabatan');
+const jabatanKerjaSelect = document.getElementById('jabatan_kerja');
+const lspSelect = document.getElementById('nama_lsp');
+const asosiasiSelect = document.getElementById('nama_asosiasi');
+
+let classificationsData = [];
+let subclassificationsData = [];
+let workPositionsData = [];
+let qualificationsData = [];
+let lspsData = [];
+let associationsData = [];
+
+function populateSelect(selectEl, data, placeholder) {
+    selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+    data.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.nama;
+        opt.dataset.id = item.id;
+        opt.textContent = item.nama;
+        selectEl.appendChild(opt);
+    });
+}
+
+async function loadMasterData() {
+    try {
+        const [clsRes, subRes, wpRes, qualRes, lspRes, assocRes] = await Promise.all([
+            fetch('{{ url("/api/master/classifications") }}'),
+            fetch('{{ url("/api/master/subclassifications") }}'),
+            fetch('{{ url("/api/master/work-positions") }}'),
+            fetch('{{ url("/api/master/qualifications") }}'),
+            fetch('{{ url("/api/master/lsps") }}'),
+            fetch('{{ url("/api/master/associations") }}')
+        ]);
+
+        classificationsData = await clsRes.json();
+        subclassificationsData = await subRes.json();
+        workPositionsData = await wpRes.json();
+        qualificationsData = await qualRes.json();
+        lspsData = await lspRes.json();
+        associationsData = await assocRes.json();
+
+        // Populate independent dropdowns
+        populateSelect(klasifikasiSelect, classificationsData, 'Pilih Klasifikasi');
+        populateSelect(kualifikasiSelect, qualificationsData, 'Pilih Kualifikasi');
+        populateSelect(lspSelect, lspsData, 'Pilih LSP');
+        populateSelect(asosiasiSelect, associationsData, 'Pilih Asosiasi');
+    } catch (e) {
+        showToast('Gagal memuat master data', 'error');
+    }
+}
+
+// Cascade Logic
+klasifikasiSelect.addEventListener('change', (e) => {
+    const selectedVal = e.target.value;
+    const selectedOpt = e.target.options[e.target.selectedIndex];
+    
+    subklasifikasiSelect.innerHTML = '<option value="">Pilih Subklasifikasi</option>';
+    subklasifikasiSelect.disabled = true;
+    jabatanKerjaSelect.innerHTML = '<option value="">Pilih Jabatan Kerja</option>';
+    jabatanKerjaSelect.disabled = true;
+    kodeJabatanInput.value = '';
+
+    if (!selectedVal || !selectedOpt || !selectedOpt.dataset.id) return;
+
+    const classId = selectedOpt.dataset.id;
+    const filtered = subclassificationsData.filter(s => s.classification_id == classId);
+    
+    populateSelect(subklasifikasiSelect, filtered, 'Pilih Subklasifikasi');
+    subklasifikasiSelect.disabled = false;
+});
+
+subklasifikasiSelect.addEventListener('change', (e) => {
+    const selectedVal = e.target.value;
+    const selectedOpt = e.target.options[e.target.selectedIndex];
+
+    jabatanKerjaSelect.innerHTML = '<option value="">Pilih Jabatan Kerja</option>';
+    jabatanKerjaSelect.disabled = true;
+    kodeJabatanInput.value = '';
+
+    if (!selectedVal || !selectedOpt || !selectedOpt.dataset.id) return;
+
+    const subId = selectedOpt.dataset.id;
+    const filtered = workPositionsData.filter(w => w.subclassification_id == subId);
+
+    jabatanKerjaSelect.innerHTML = '<option value="">Pilih Jabatan Kerja</option>';
+    filtered.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.nama;
+        opt.dataset.id = item.id;
+        opt.dataset.kode = item.kode_jabatan;
+        opt.textContent = `${item.nama} (${item.kode_jabatan})`;
+        jabatanKerjaSelect.appendChild(opt);
+    });
+
+    jabatanKerjaSelect.disabled = false;
+});
+
+jabatanKerjaSelect.addEventListener('change', (e) => {
+    const selectedVal = e.target.value;
+    const selectedOpt = e.target.options[e.target.selectedIndex];
+
+    if (!selectedVal || !selectedOpt || !selectedOpt.dataset.kode) {
+        kodeJabatanInput.value = '';
+        return;
+    }
+
+    kodeJabatanInput.value = selectedOpt.dataset.kode;
+});
+
+// ──────────────────────────────────────────────────────────────
 // Toast
 // ──────────────────────────────────────────────────────────────
 function showToast(message, type = 'success') {
@@ -438,6 +565,11 @@ function resetForm() {
     cancelBtn.classList.add('hidden');
     kabSelect.innerHTML = '<option value="">Pilih Kabupaten / Kota</option>';
     kabSelect.disabled = true;
+    subklasifikasiSelect.innerHTML = '<option value="">Pilih Subklasifikasi</option>';
+    subklasifikasiSelect.disabled = true;
+    jabatanKerjaSelect.innerHTML = '<option value="">Pilih Jabatan Kerja</option>';
+    jabatanKerjaSelect.disabled = true;
+    kodeJabatanInput.value = '';
     lucide.createIcons();
 }
 
@@ -499,8 +631,9 @@ certsGrid.addEventListener('click', async (e) => {
     if (btn.classList.contains('btn-edit')) {
         if (!cert) return;
         certIdInput.value = cert.id;
-        FIELDS.forEach(f => {
-            if (f === 'provinsi' || f === 'kabupaten') return;
+        
+        // Populate text inputs & dates
+        ['nama', 'nomor_registrasi', 'tanggal_ditetapkan', 'tanggal_berlaku'].forEach(f => {
             let val = cert[f] || '';
             if ((f === 'tanggal_ditetapkan' || f === 'tanggal_berlaku') && val) {
                 val = val.substring(0, 10);
@@ -515,6 +648,54 @@ certsGrid.addEventListener('click', async (e) => {
         } else {
             kabSelect.innerHTML = '<option value="">Pilih Kabupaten / Kota</option>';
             kabSelect.disabled = true;
+        }
+
+        // Set independent selects: kualifikasi, nama_lsp, nama_asosiasi
+        selectOptionCaseInsensitive(kualifikasiSelect, cert.kualifikasi || '');
+        selectOptionCaseInsensitive(lspSelect, cert.nama_lsp || '');
+        selectOptionCaseInsensitive(asosiasiSelect, cert.nama_asosiasi || '');
+
+        // Set dependent selects: klasifikasi, subklasifikasi, jabatan_kerja
+        const classOpt = selectOptionCaseInsensitive(klasifikasiSelect, cert.klasifikasi || '');
+        if (classOpt && classOpt.dataset.id) {
+            const classId = classOpt.dataset.id;
+            const filteredSubs = subclassificationsData.filter(s => s.classification_id == classId);
+            populateSelect(subklasifikasiSelect, filteredSubs, 'Pilih Subklasifikasi');
+            subklasifikasiSelect.disabled = false;
+
+            const subOpt = selectOptionCaseInsensitive(subklasifikasiSelect, cert.subklasifikasi || '');
+            if (subOpt && subOpt.dataset.id) {
+                const subId = subOpt.dataset.id;
+                const filteredWps = workPositionsData.filter(w => w.subclassification_id == subId);
+                
+                jabatanKerjaSelect.innerHTML = '<option value="">Pilih Jabatan Kerja</option>';
+                filteredWps.forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item.nama;
+                    opt.dataset.id = item.id;
+                    opt.dataset.kode = item.kode_jabatan;
+                    opt.textContent = `${item.nama} (${item.kode_jabatan})`;
+                    jabatanKerjaSelect.appendChild(opt);
+                });
+                jabatanKerjaSelect.disabled = false;
+
+                const wpOpt = selectOptionCaseInsensitive(jabatanKerjaSelect, cert.jabatan_kerja || '');
+                if (wpOpt && wpOpt.dataset.kode) {
+                    kodeJabatanInput.value = wpOpt.dataset.kode;
+                } else {
+                    kodeJabatanInput.value = cert.kode_jabatan || '';
+                }
+            } else {
+                jabatanKerjaSelect.innerHTML = '<option value="">Pilih Jabatan Kerja</option>';
+                jabatanKerjaSelect.disabled = true;
+                kodeJabatanInput.value = '';
+            }
+        } else {
+            subklasifikasiSelect.innerHTML = '<option value="">Pilih Subklasifikasi</option>';
+            subklasifikasiSelect.disabled = true;
+            jabatanKerjaSelect.innerHTML = '<option value="">Pilih Jabatan Kerja</option>';
+            jabatanKerjaSelect.disabled = true;
+            kodeJabatanInput.value = '';
         }
 
         isEditing = true;
@@ -609,6 +790,7 @@ qrModal.addEventListener('click', (e) => { if (e.target === qrModal) qrModal.cla
 // ──────────────────────────────────────────────────────────────
 lucide.createIcons();
 loadProvinces();
+loadMasterData();
 loadCerts();
 </script>
 @endpush

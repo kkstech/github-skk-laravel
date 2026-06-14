@@ -324,6 +324,14 @@
 </head>
 <body>
     <div class="app-container">
+        <nav class="nav-menu" style="display: flex; justify-content: center; gap: 1rem; margin-bottom: 0.5rem; border-bottom: 1px solid var(--card-border); padding-bottom: 1rem;">
+            <a href="{{ route('certificates.index') }}" class="btn btn-secondary" style="width: auto; padding: 0.5rem 1rem; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; font-size: 0.9rem;">
+                <i data-lucide="award" style="width: 18px; height: 18px;"></i> SKK Manager
+            </a>
+            <a href="{{ route('master.index') }}" class="btn btn-secondary" style="width: auto; padding: 0.5rem 1rem; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; font-size: 0.9rem;">
+                <i data-lucide="database" style="width: 18px; height: 18px;"></i> Master Data
+            </a>
+        </nav>
         @yield('content')
     </div>
 

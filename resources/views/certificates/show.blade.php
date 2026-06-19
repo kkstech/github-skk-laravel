@@ -121,12 +121,12 @@
             </div>
             <div class="data-row">
                 <div class="data-label">Tanggal Ditetapkan:</div>
-                <div class="data-value">{{ $certificate->tanggal_ditetapkan ? $certificate->tanggal_ditetapkan->translatedFormat('d F Y') : '' }}</div>
+                <div class="data-value">{{ $certificate->tanggal_ditetapkan ? $certificate->tanggal_ditetapkan->translatedFormat('d F Y H:i:s') : '' }}</div>
             </div>
             <div class="data-row">
                 <div class="data-label">Tanggal Masa Berlaku<br>Sampai Dengan:</div>
                 <div class="data-value" style="display: flex; align-items: flex-end; justify-content: flex-end;">
-                    {{ $certificate->tanggal_berlaku ? $certificate->tanggal_berlaku->translatedFormat('d F Y') : '' }}
+                    {{ $certificate->tanggal_berlaku ? $certificate->tanggal_berlaku->translatedFormat('d F Y H:i:s') : '' }}
                 </div>
             </div>
         </div>

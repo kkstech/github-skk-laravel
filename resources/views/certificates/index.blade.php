@@ -101,12 +101,12 @@
 
                 <div class="input-group">
                     <label for="tanggal_ditetapkan">Tanggal Ditetapkan</label>
-                    <input type="date" id="tanggal_ditetapkan" required autocomplete="off">
+                    <input type="datetime-local" id="tanggal_ditetapkan" required autocomplete="off">
                 </div>
 
                 <div class="input-group">
                     <label for="tanggal_berlaku">Berlaku Sampai</label>
-                    <input type="date" id="tanggal_berlaku" required autocomplete="off">
+                    <input type="datetime-local" id="tanggal_berlaku" required autocomplete="off">
                 </div>
             </div>
 
@@ -636,7 +636,8 @@ certsGrid.addEventListener('click', async (e) => {
         ['nama', 'nomor_registrasi', 'tanggal_ditetapkan', 'tanggal_berlaku'].forEach(f => {
             let val = cert[f] || '';
             if ((f === 'tanggal_ditetapkan' || f === 'tanggal_berlaku') && val) {
-                val = val.substring(0, 10);
+                // Format to 'YYYY-MM-DDTHH:mm' for datetime-local input
+                val = val.replace(' ', 'T').substring(0, 16);
             }
             document.getElementById(f).value = val;
         });

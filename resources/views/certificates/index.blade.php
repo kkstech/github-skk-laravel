@@ -28,9 +28,14 @@
             <input type="hidden" id="cert-id" value="">
 
             <div class="form-grid">
-                <div class="input-group">
-                    <label for="nama">Nama</label>
+                <div class="input-group full-width">
+                    <label for="nama">Nama Lengkap</label>
                     <input type="text" id="nama" placeholder="Contoh: SITI NUR AMALIA" required autocomplete="off">
+                </div>
+
+                <div class="input-group full-width">
+                    <label for="nomor_registrasi">Nomor Registrasi</label>
+                    <input type="text" id="nomor_registrasi" placeholder="Contoh: F 1993 15056 2026 0219554 SI 09" required autocomplete="off">
                 </div>
 
                 <div class="input-group">
@@ -54,7 +59,7 @@
                     </select>
                 </div>
 
-                <div class="input-group full-width">
+                <div class="input-group">
                     <label for="subklasifikasi">Subklasifikasi</label>
                     <select id="subklasifikasi" required disabled>
                         <option value="">Pilih Subklasifikasi</option>
@@ -80,19 +85,14 @@
                     </select>
                 </div>
 
-                <div class="input-group full-width">
-                    <label for="nomor_registrasi">Nomor Registrasi</label>
-                    <input type="text" id="nomor_registrasi" placeholder="Contoh: F 1993 15056 2026 0219554 SI 09" required autocomplete="off">
-                </div>
-
-                <div class="input-group full-width">
+                <div class="input-group">
                     <label for="nama_lsp">Nama LSP</label>
                     <select id="nama_lsp" required>
                         <option value="">Pilih LSP</option>
                     </select>
                 </div>
 
-                <div class="input-group full-width">
+                <div class="input-group">
                     <label for="nama_asosiasi">Nama Asosiasi</label>
                     <select id="nama_asosiasi" required>
                         <option value="">Pilih Asosiasi</option>

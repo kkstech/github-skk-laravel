@@ -4,28 +4,61 @@
 
 @push('styles')
 <style>
+    .tabs-container {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        padding: 0.75rem !important;
+        margin-bottom: 2rem;
+    }
+    
     .tab-btn {
         background: transparent;
         color: var(--text-muted);
         border: 1px solid transparent;
         transition: var(--transition);
         border-radius: var(--radius-sm);
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        padding: 0.5rem 1.25rem;
+        width: auto !important;
+        height: 38px;
     }
     .tab-btn:hover {
         color: white;
-        background: rgba(255,255,255,0.05);
+        background: rgba(255,255,255,0.04);
+        border-color: rgba(255, 255, 255, 0.05);
     }
     .tab-btn.active {
         background: var(--primary);
         color: white;
+        border-color: var(--primary);
         box-shadow: 0 4px 12px var(--primary-glow);
     }
-    .master-table th, .master-table td {
-        padding: 0.75rem 1rem;
+    
+    .master-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+    }
+    .master-table th {
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        padding: 0.875rem 1rem;
+        border-bottom: 2px solid var(--card-border);
+    }
+    .master-table td {
+        padding: 1rem;
         border-bottom: 1px solid var(--card-border);
+        color: var(--text-main);
     }
     .master-table tbody tr:hover {
-        background: rgba(255,255,255,0.02);
+        background: rgba(255, 255, 255, 0.02);
     }
 </style>
 @endpush
@@ -43,13 +76,13 @@
     </div>
 </header>
 
-<div class="tabs-container glass-panel" style="margin-bottom: 2rem; padding: 1rem; display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
-    <button class="btn tab-btn active" data-tab="classifications" style="width: auto; padding: 0.5rem 1rem;">Klasifikasi</button>
-    <button class="btn tab-btn" data-tab="subclassifications" style="width: auto; padding: 0.5rem 1rem;">Subklasifikasi</button>
-    <button class="btn tab-btn" data-tab="work-positions" style="width: auto; padding: 0.5rem 1rem;">Jabatan Kerja</button>
-    <button class="btn tab-btn" data-tab="qualifications" style="width: auto; padding: 0.5rem 1rem;">Kualifikasi</button>
-    <button class="btn tab-btn" data-tab="lsps" style="width: auto; padding: 0.5rem 1rem;">LSP</button>
-    <button class="btn tab-btn" data-tab="associations" style="width: auto; padding: 0.5rem 1rem;">Asosiasi</button>
+<div class="tabs-container glass-panel">
+    <button class="btn tab-btn active" data-tab="classifications">Klasifikasi</button>
+    <button class="btn tab-btn" data-tab="subclassifications">Subklasifikasi</button>
+    <button class="btn tab-btn" data-tab="work-positions">Jabatan Kerja</button>
+    <button class="btn tab-btn" data-tab="qualifications">Kualifikasi</button>
+    <button class="btn tab-btn" data-tab="lsps">LSP</button>
+    <button class="btn tab-btn" data-tab="associations">Asosiasi</button>
 </div>
 
 <main class="app-main">

@@ -53,6 +53,9 @@ class CertificateController extends Controller
             'tanggal_berlaku'    => 'required|date',
         ]);
 
+        $validated['tanggal_ditetapkan'] = \Carbon\Carbon::parse($validated['tanggal_ditetapkan'])->format('Y-m-d H:i:s');
+        $validated['tanggal_berlaku'] = \Carbon\Carbon::parse($validated['tanggal_berlaku'])->format('Y-m-d H:i:s');
+
         $cert = Certificate::create($validated);
 
         return response()->json([
@@ -93,6 +96,9 @@ class CertificateController extends Controller
             'tanggal_ditetapkan' => 'required|date',
             'tanggal_berlaku'    => 'required|date',
         ]);
+
+        $validated['tanggal_ditetapkan'] = \Carbon\Carbon::parse($validated['tanggal_ditetapkan'])->format('Y-m-d H:i:s');
+        $validated['tanggal_berlaku'] = \Carbon\Carbon::parse($validated['tanggal_berlaku'])->format('Y-m-d H:i:s');
 
         $certificate->update($validated);
 

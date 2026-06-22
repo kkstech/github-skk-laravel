@@ -24,8 +24,8 @@ class CertificateTest extends TestCase
             'nomor_registrasi' => 'REG-123456',
             'nama_lsp' => 'LSP INDONESIA',
             'nama_asosiasi' => 'ASTEKINDO',
-            'tanggal_ditetapkan' => '2026-06-11',
-            'tanggal_berlaku' => '2029-06-11',
+            'tanggal_ditetapkan' => '2026-06-11T14:35',
+            'tanggal_berlaku' => '2029-06-11T15:40',
         ];
 
         $response = $this->postJson(route('certificates.store'), $data);
@@ -38,8 +38,8 @@ class CertificateTest extends TestCase
 
         $cert = Certificate::first();
         $this->assertEquals('JOHN DOE', $cert->nama);
-        $this->assertEquals('2026-06-11', $cert->tanggal_ditetapkan->format('Y-m-d'));
-        $this->assertEquals('2029-06-11', $cert->tanggal_berlaku->format('Y-m-d'));
+        $this->assertEquals('2026-06-11 14:35:00', $cert->tanggal_ditetapkan->format('Y-m-d H:i:s'));
+        $this->assertEquals('2029-06-11 15:40:00', $cert->tanggal_berlaku->format('Y-m-d H:i:s'));
     }
 
     public function test_cannot_create_certificate_with_invalid_dates(): void
@@ -80,13 +80,13 @@ class CertificateTest extends TestCase
             'nomor_registrasi' => 'REG-123456',
             'nama_lsp' => 'LSP INDONESIA',
             'nama_asosiasi' => 'ASTEKINDO',
-            'tanggal_ditetapkan' => '2026-06-11',
-            'tanggal_berlaku' => '2029-06-11',
+            'tanggal_ditetapkan' => '2026-06-11 14:35:00',
+            'tanggal_berlaku' => '2029-06-11 15:40:00',
         ]);
 
         $updateData = array_merge($certificate->toArray(), [
-            'tanggal_ditetapkan' => '2026-07-20',
-            'tanggal_berlaku' => '2029-07-20',
+            'tanggal_ditetapkan' => '2026-07-20T10:15',
+            'tanggal_berlaku' => '2029-07-20T11:25',
         ]);
 
         $response = $this->putJson(route('certificates.update', $certificate->id), $updateData);
@@ -98,7 +98,7 @@ class CertificateTest extends TestCase
                  ]);
 
         $cert = $certificate->fresh();
-        $this->assertEquals('2026-07-20', $cert->tanggal_ditetapkan->format('Y-m-d'));
-        $this->assertEquals('2029-07-20', $cert->tanggal_berlaku->format('Y-m-d'));
+        $this->assertEquals('2026-07-20 10:15:00', $cert->tanggal_ditetapkan->format('Y-m-d H:i:s'));
+        $this->assertEquals('2029-07-20 11:25:00', $cert->tanggal_berlaku->format('Y-m-d H:i:s'));
     }
 }

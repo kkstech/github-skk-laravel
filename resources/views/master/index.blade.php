@@ -440,7 +440,7 @@ async function switchTab(tabName) {
 
 async function loadRecords() {
     const config = TABS_CONFIG[currentTab];
-    const apiKey = currentTab.replace('-', '_');
+    const apiKey = currentTab.replace(/-/g, '_');
     
     tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center;"><span class="loading-spinner"></span></td></tr>';
 
@@ -457,9 +457,11 @@ async function loadRecords() {
         }
 
         emptyState.classList.add('hidden');
+        let rowsHtml = '';
         records.forEach(r => {
-            tableBody.innerHTML += config.renderRow(r);
+            rowsHtml += config.renderRow(r);
         });
+        tableBody.innerHTML = rowsHtml;
 
         lucide.createIcons();
     } catch (e) {
@@ -485,7 +487,7 @@ form.addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const config = TABS_CONFIG[currentTab];
-    const apiKey = currentTab.replace('-', '_');
+    const apiKey = currentTab.replace(/-/g, '_');
     const data = config.getFieldsData();
 
     const id = recordIdInput.value;
@@ -545,11 +547,16 @@ tableBody.addEventListener('click', async (e) => {
     const id = btn.dataset.id;
     const record = records.find(r => r.id == id);
     const config = TABS_CONFIG[currentTab];
-    const apiKey = currentTab.replace('-', '_');
-
+    const apiKey = currentTab.replace(/-/g, '_');
+ 
     if (btn.classList.contains('btn-edit')) {
         if (!record) return;
         recordIdInput.value = record.id;
+        
+        // Ensure inputs are rendered inside formFields before populating
+        const fieldsHtml = await Promise.resolve(config.fields());
+        formFields.innerHTML = fieldsHtml;
+        
         config.populateForm(record);
         
         isEditing = true;

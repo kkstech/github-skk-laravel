@@ -2,6 +2,14 @@
 
 @section('title', 'SKK Manager')
 
+@push('styles')
+<style>
+    .form-section {
+        padding-right: 3rem;
+    }
+</style>
+@endpush
+
 @section('content')
 <header class="app-header">
     <div class="header-title">

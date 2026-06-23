@@ -23,7 +23,7 @@ class Certificate extends Model
     ];
 
     protected $casts = [
-        'tanggal_ditetapkan' => 'datetime',
-        'tanggal_berlaku'    => 'datetime',
+        'tanggal_ditetapkan' => 'datetime:Y-m-d H:i:s',
+        'tanggal_berlaku'    => 'datetime:Y-m-d H:i:s',
     ];
 }
